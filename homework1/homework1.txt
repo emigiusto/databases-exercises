@@ -1,0 +1,72 @@
+1)
+/* How many entries do not have a registered height?*/
+select count(*) from person where height IS NULL
+47315
+
+2)
+/*For how many movies is the average height of all people involved greater than 190
+centimetres?*/
+select count (*) from (select involved.movieid, avg(person.height) 
+	from involved
+		join person on person.id = involved.personid
+		where person.height IS NOT NULL
+	group by involved.movieid
+	having avg(person.height) > 190) as foo
+89
+
+3)
+/* How many movies in movie genre have such duplicate entries?*/
+select count(*) from (select count(movieid) from movie_genre
+	group by movieid
+	having count(movieid) > 1) as foo
+11673
+
+4)
+/*  How many different persons acted in movies directed by ‘Steven Spielberg’?*/
+select count(*) from (
+select involved.personid from involved
+	join (select movieid from involved join person on involved.personid = person.id
+			where role = 'director'
+			and name = 'Steven Spielberg') as ss on involved.movieid = ss.movieid
+			where involved.role = 'actor'
+	group by involved.personid) as foo
+2219
+
+5)
+/* How many movies produced in 1999 have no registered entry in involved? */
+select sum((select count(year) from movie where year = 1999) - 
+(select count(*) from (select count(*) from involved join movie on movie.id = involved.movieid where movie.year = 1999 group by movieid) as a))
+7
+
+6)
+/* In the database, the number of persons who have acted in exactly one movie that they self directed is 603. How many persons have acted in more than one movie that they self directed?*/
+select count(*) from (
+select s1.personid,count(s1.personid) from involved s1 join involved s2 on s1.personid = s2.personid
+where s1.role = 'actor' and s2.role = 'director'
+AND s1.movieid = s2.movieid
+group by s1.personid
+having count(s1.personid) > 1) as f
+
+345
+
+7) 
+/* How many movies produced in 1999 have entries registered in involved for all roles 
+defined in the roles relation? */ 
+
+select count(*) from (select count(role) from (select movieid, involved.role from movie 
+	join involved on  movie.id = involved.movieid 
+	where year = 1999
+	group by movieid, involved.role
+	order by movieid) as foo
+		group by movieid
+		having count(role)=2) as foo2
+250
+
+8) 
+
+select count(*) from (select involved.personid, count(foo.Genre)
+	from involved join (select movie_genre.movieid, movie_genre.genre as Genre, category as Category from movie_genre 
+						join genre on genre.genre = movie_genre.genre where genre.category = 'Lame') as foo on foo.movieid = involved.movieid
+	group by personid
+	having count(distinct foo.Genre)= (select count(*) from genre where category = 'Lame')) as result
+1

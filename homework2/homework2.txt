@@ -1,0 +1,28 @@
+a)
+select count(*) from empires where empire = 'Danish Empire'
+3
+
+b)
+select count(*) from (select countrycode, count(countrycode) from countries_continents
+	group by countrycode having count(countrycode)>1) as multiCountries
+	join (select countrycode from countries_continents where continent = 'Europe' AND percentage <100) as PartEu
+	on multiCountries.countrycode = PartEu.countrycode
+2
+
+c)
+select sum(countries.population * (countries_languages.percentage/100))
+	from countries_languages 
+	join countries_continents on countries_languages.countrycode = countries_continents.countrycode
+	join countries on countries.code = countries_languages.countrycode
+	where countries_continents.continent = 'South America' 
+	and countries_languages.language = 'Spanish'
+	and countries.population > 1000000
+160575157
+
+d)
+select count(*) from (select countries_languages.language, count(countries_languages.language) from countries_languages 
+	join empires on countries_languages.countrycode = empires.countrycode
+	where empires.empire = 'Benelux'
+	group by countries_languages.language
+	having count(countries_languages.countrycode) >= (select count(*) from empires where empire = 'Benelux')) as foo
+2

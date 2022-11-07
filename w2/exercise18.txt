@@ -1,0 +1,17 @@
+/*
+The	number	of	athletes	who	have	competed	in	at	least	ten	different	
+‘places’.	Note	that	it	does	not	matter	how	many	sports	or	competitions	
+they	competed	in,	just	how	many	places	they	have	competed	in.	
+This	query	should	return	the	number	206.
+*/
+
+select * from competitions
+
+select peopleid, count(place) from 
+	(select results.peopleid, competitions.place
+			from results
+				join competitions on competitions.id = results.competitionid
+				group by results.peopleid, competitions.place order by results.peopleid) as foo 
+	group by foo.peopleid
+	having count(place) >= 10
+	order by foo.peopleid

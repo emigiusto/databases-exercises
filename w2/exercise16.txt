@@ -1,0 +1,10 @@
+select DISTINCT ON (results.peopleid)
+	results.peopleid,
+	people.name 
+	from results
+		join competitions on results.competitionid = competitions.id
+		join people on results.peopleid = people.id
+		join sports on sports.id = results.sportid
+where EXTRACT(MONTH FROM competitions.held) = 6 AND EXTRACT(YEAR FROM competitions.held) = 2002
+OR (sports.name = 'High Jump' and results.result >= sports.record)
+ORDER BY results.peopleid, competitions.held desc

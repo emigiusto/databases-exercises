@@ -1,0 +1,54 @@
+-- pid --> pn
+-- hid --> hs,hz
+-- pid,hid -->s
+-- hz --> hc
+
+DROP TABLE IF EXISTS Cities;
+DROP TABLE IF EXISTS Boats;
+DROP TABLE IF EXISTS Customers;
+DROP TABLE IF EXISTS RentalsA;
+
+CREATE TABLE Cities (
+       HZ INTEGER NOT NULL, 
+       HC VARCHAR(50) NOT NULL,
+       PRIMARY KEY (HZ)
+);
+
+CREATE TABLE Boats (
+       HID INTEGER NOT NULL, 
+       HS VARCHAR(50) NOT NULL,
+       HZ INTEGER NOT NULL, 
+       PRIMARY KEY (HID),
+       FOREIGN KEY (HZ) REFERENCES Cities (HZ)
+);
+
+CREATE TABLE Customers (
+       PID INTEGER NOT NULL,
+       PN VARCHAR NOT NULL, 
+       PRIMARY KEY (PID)
+);
+
+CREATE TABLE RentalsA (
+       PID INTEGER NOT NULL,
+       HID INTEGER NOT NULL, 
+       S INTEGER NOT NULL, 
+       PRIMARY KEY (PID, HID),
+       FOREIGN KEY (HID) REFERENCES Boats (HID),
+       FOREIGN KEY (PID) REFERENCES Customers (PID)
+);
+
+INSERT INTO Cities 
+SELECT DISTINCT HZ, HC 
+FROM Rentals;
+
+INSERT INTO Boats
+SELECT DISTINCT HID, HS, HZ 
+FROM Rentals;
+
+INSERT INTO Customers
+SELECT DISTINCT PID, PN
+FROM Rentals;
+
+INSERT INTO RentalsA
+SELECT DISTINCT PID, HID, S 
+FROM Rentals;

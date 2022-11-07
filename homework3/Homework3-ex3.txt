@@ -1,0 +1,30 @@
+The available indexes are:
+(a) Part(id)
+(b) Part(stock)
+(c) Part(price)
+(d) Part(stock, price)
+(e) Part(stock, price, id)
+(f) No index
+
+Query 1: 
+select id
+from Part
+where stock > (select max(price) from Part);
+       (b) Part(stock)
+
+Query 2: 
+select id, descr
+from Part;
+       (f) No index
+
+Query 3: 
+select stock
+from Part
+where price = 23;
+       (c) Part(price)
+
+Query 4:
+select id, descr, price
+from Part
+where stock > 35;
+       (b) Part(stock)

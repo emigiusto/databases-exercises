@@ -1,0 +1,116 @@
+DROP TABLE IF EXISTS People CASCADE;
+DROP TABLE IF EXISTS Enemy CASCADE;
+DROP TABLE IF EXISTS Member CASCADE;
+DROP TABLE IF EXISTS Asset CASCADE;
+DROP TABLE IF EXISTS Party CASCADE;
+DROP TABLE IF EXISTS Opposes CASCADE;
+DROP TABLE IF EXISTS Linking CASCADE;
+DROP TABLE IF EXISTS Participate CASCADE;
+DROP TABLE IF EXISTS Monitors CASCADE;
+DROP TABLE IF EXISTS Sponsor CASCADE;
+DROP TABLE IF EXISTS SGrant CASCADE;
+DROP TABLE IF EXISTS Role CASCADE;
+DROP TABLE IF EXISTS Serve_in CASCADE;
+
+CREATE TABLE People (
+    ID INT,
+    Name VARCHAR NOT NULL,
+    Address VARCHAR NOT NULL,
+    Phone INT NOT NULL,
+    DOB DATE NOT NULL,
+    DOD DATE NULL,
+    PRIMARY KEY (ID)
+);
+
+CREATE TABLE Enemy (
+    ID INT REFERENCES People,
+    Reason VARCHAR NOT NULL,
+    PRIMARY KEY (ID)
+);
+
+CREATE TABLE Member (
+    ID INT REFERENCES People,
+    Start_date DATE NOT NULL,
+    PRIMARY KEY (ID)
+);
+
+CREATE TABLE Asset (
+    MemberID INT REFERENCES Member(ID),
+    Name VARCHAR NOT NULL,
+    Detail VARCHAR NOT NULL,
+    Uses VARCHAR NOT NULL,
+    PRIMARY KEY (MemberID, Name)
+);
+CREATE TABLE Opposes (
+    MID INT REFERENCES Member(ID),
+    OpponentID INT NOT NULL, --Either PartyID or EnemyID
+    Start_Date DATE NOT NULL,
+    End_Date DATE NULL,
+    PRIMARY KEY (MID, OpponentID)
+);
+
+CREATE TABLE Party (
+    ID INT,
+    Name VARCHAR NOT NULL,
+    Country VARCHAR NOT NULL,
+    PRIMARY KEY (ID),
+    UNIQUE (Name, Country)
+);
+
+CREATE TABLE Monitors (
+    PartyID INT REFERENCES Party(ID),
+    MemberID INT NOT NULL REFERENCES Member(ID),
+    start_date DATE NOT NULL,
+    end_date DATE,
+    PRIMARY KEY (PartyID)
+);
+
+CREATE TABLE Sponsor (
+    ID INT,
+    Name VARCHAR NOT NULL,
+    Address VARCHAR NOT NULL,
+    Industry VARCHAR NOT NULL,
+    PRIMARY KEY (ID)
+);
+
+CREATE TABLE SGrant (
+    SID INT REFERENCES Sponsor(ID),
+    MID INT REFERENCES Member(ID),
+    G_Date DATE,
+    G_Amount INT NOT NULL,
+    G_Payback VARCHAR NOT NULL,
+    PRIMARY KEY (SID, MID, G_Date),
+    RID INT NOT NULL REFERENCES Member(ID),
+    R_Date DATE NOT NULL,
+    R_Grade INT,
+    CHECK ((R_Grade >= 1) AND (R_Grade <=10))
+);
+
+CREATE TABLE Linking (
+    ID INT PRIMARY KEY,
+    Name VARCHAR NOT NULL,
+    Type CHAR(1) NOT NULL,
+    Description VARCHAR NOT NULL
+);
+
+CREATE TABLE Participate (
+    LinkingID INT REFERENCES Linking(ID),
+    PeopleID INT REFERENCES People(ID),
+    MonitoredBy INT REFERENCES Member(ID),
+    PRIMARY KEY (LinkingID, PeopleID)
+);
+
+CREATE TABLE Role (
+    ID INT PRIMARY KEY,
+    Title VARCHAR NOT NULL,
+    UNIQUE (Title)
+);
+
+CREATE TABLE Serve_in (
+    RID INT REFERENCES Role(ID),
+    MID INT REFERENCES Member(ID),
+    Start_date DATE NOT NULL,
+    End_date DATE NOT NULL,
+    Salary INTEGER NOT NULL,
+    PRIMARY KEY (RID, MID)
+);

@@ -1,0 +1,9 @@
+select   DISTINCT ON (results.peopleid) 
+			results.peopleid, 
+			count(results.peopleid), 
+			count(sports.id)
+				from results
+				join sports on sports.id = results.sportid
+				where results.result >= sports.record
+				group by peopleid,sports.id
+				having count(sports.id) > (select count(*) from sports)
